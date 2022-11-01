@@ -46,7 +46,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> save(@RequestBody Usuario usuario){
+    public ResponseEntity<Usuario> save(@RequestBody UsuarioPostRequestBody UsuarioPostRequestBody){
         return new ResponseEntity<>(usuarioService.save(usuario), HttpStatus.CREATED);
     }
     @DeleteMapping(path = "/{id}")
@@ -55,8 +55,8 @@ public class UsuarioController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PutMapping
-    public ResponseEntity<Void> replace(@RequestBody Usuario usuario){
-        usuarioService.replace(usuario);
+    public ResponseEntity<Void> replace(@RequestBody UsuarioPutRequestBody UsuarioPutRequestBody){
+        usuarioService.replace(UsuarioPutRequestBody);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

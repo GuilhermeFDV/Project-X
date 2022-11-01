@@ -12,33 +12,34 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.br.DSW.domain.Usuario;
 
+import repository.UsuarioRepository;
+
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
-    private static List<Usuario> usuarios;
-    static{
-        usuarios = new ArrayList<>(List.of(new Usuario(1L,"Guilherme Falcão"),new Usuario(2L,"Marco Antonio"),new Usuario(3L,"Ricardo Ribas"),new Usuario(4L,"Vinicius Caires")));
-    }
+
+    private final UsuarioRepository usuarioRepository;
     public List<Usuario> listall(){
-        return usuarios; 
+        return usuarioRepository.findAll(); 
     }
-    public Usuario findById(long id){
+    public Usuario findByIdOrThrowBadRequestException(long id){
 
-        return usuarios.stream().filter(usuario -> usuario.getId().equals(id))
-        .findFirst()
-        .orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Usuário not found"));
-
+        return usuarioRepository.findByIdOrThrowBadRequestException(id).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Usuário not found"));
 
     }
-    public Usuario save(Usuario usuario){
-        usuario.setId(ThreadLocalRandom.current().nextLong(3,1000000000));
-        usuarios.add(usuario);
-        return usuario;
+    public Usuario save(UsuarioPostRequestBody UsuarioPostRequestBody){
+        Usuario usuario=Usuario.builder().name(UsuarioPostRequestBody.getName()).build();
+        return usuarioRepository.save(usuario);
     }
     public void delete(Long id) {
-        usuarios.remove(findById(id));
+        usuarioRepository.delete(findByIdOrThrowBadRequestException(id));
     }
-    public void replace(Usuario usuario) {
-        delete(usuario.getId());
-        usuarios.add(usuario);
+    public void replace(UsuarioPutRequestBody UsuarioPutRequestBody) {
+        Usuario saveduUsuario=findByIdOrThrowBadRequestException(UsuarioPutRequestBody.getId());
+        Usuario usuario = Usuario.builder()
+            .id(saveduUsuario.getId())
+            .name(UsuarioPutRequestBody.getName())
+            .build();
+        usuarioRepository.save(usuario);
     }
 }
